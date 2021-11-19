@@ -5,11 +5,19 @@ import org.shaq.graphql.annotations.parameters.GraphQLParameterObject;
 import org.shaq.graphql.annotations.parameters.GraphQLParametersClass;
 import org.shaq.graphql.exceptions.GraphQLQueryGenerationException;
 import org.shaq.graphql.generator.GraphqlQueryStringBuilder;
+import org.shaq.graphql.util.ReflactionHelper;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.List;
 
-public class GraphqlParameterGenerator {
+public class GraphQLParameterGenerator {
+
+    private final ReflactionHelper reflactionHelper;
+
+    public GraphQLParameterGenerator(ReflactionHelper reflactionHelper) {
+        this.reflactionHelper = reflactionHelper;
+    }
 
     public String generateParameterForClientQuery(Class<?> classToGenerate) {
         GraphqlQueryStringBuilder builder = new GraphqlQueryStringBuilder();
@@ -39,7 +47,7 @@ public class GraphqlParameterGenerator {
     }
 
     private void findAllParameterNameAndType(Class<?> classToGenerate, GraphqlQueryStringBuilder builder) {
-        Field[] fields = classToGenerate.getDeclaredFields();
+        List<Field> fields = reflactionHelper.getAllFieldsOfClass(classToGenerate);
         for (Field field : fields) {
             if(field.isAnnotationPresent(GraphQLParameterObject.class)) {
                 findAllParameterNameAndType(field.getType(), builder);
@@ -53,7 +61,7 @@ public class GraphqlParameterGenerator {
     }
 
     private void buildQueryServerParameterForObject(Class<?> classToGenerate, GraphqlQueryStringBuilder builder) {
-        Field[] fields = classToGenerate.getDeclaredFields();
+        List<Field> fields = reflactionHelper.getAllFieldsOfClass(classToGenerate);
         for (Field field : fields) {
             if(field.isAnnotationPresent(GraphQLParameterObject.class)) {
                 builder.append(field.getName()).append(":").append("{");
@@ -69,7 +77,7 @@ public class GraphqlParameterGenerator {
     }
 
     private <T> void putAllParametersAndValuesInHash(T objectToGenerate, HashMap<String,Object> hash){
-        Field[] fields = objectToGenerate.getClass().getDeclaredFields();
+        List<Field> fields = reflactionHelper.getAllFieldsOfClass(objectToGenerate.getClass());
         for (Field field : fields) {
             field.setAccessible(true);
             try {
