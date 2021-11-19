@@ -2,9 +2,7 @@ package org.shaq.graphql.models;
 
 import java.util.HashMap;
 
-/**
- * Created by galhen on 03/06/2018.
- */
+
 public class GraphQLQueryModel {
 
     private String query;

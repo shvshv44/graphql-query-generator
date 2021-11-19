@@ -3,7 +3,7 @@ package org.shaq.graphql.models;
 import com.google.gson.JsonElement;
 
 /**
- * This class warp a graphql response data for GSON convert
+ * This class warps a GraphQL response data for GSON deserializing
  */
 public class GraphQLDataModel <T> {
 
