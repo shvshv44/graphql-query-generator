@@ -3,7 +3,7 @@ package org.shaq.graphql.generator.parameters;
 import org.shaq.graphql.annotations.parameters.GraphQLParameter;
 import org.shaq.graphql.annotations.parameters.GraphQLParameterObject;
 import org.shaq.graphql.annotations.parameters.GraphQLParametersClass;
-import org.shaq.graphql.exceptions.GraphQLQueryGeneratorException;
+import org.shaq.graphql.exceptions.GraphQLQueryGenerationException;
 import org.shaq.graphql.generator.GraphqlQueryStringBuilder;
 
 import java.lang.reflect.Field;
@@ -81,7 +81,7 @@ public class GraphqlParameterGenerator {
                     hash.put(parameterAnnotation.name(), fieldValue);
                 }
             } catch (IllegalAccessException e) {
-                throw new GraphQLQueryGeneratorException("The value of parameter " + field + " cannot be accessed.");
+                throw new GraphQLQueryGenerationException("The value of parameter " + field + " cannot be accessed.");
             }
         }
     }

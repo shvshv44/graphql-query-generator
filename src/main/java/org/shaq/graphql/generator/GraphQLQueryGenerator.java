@@ -2,11 +2,12 @@ package org.shaq.graphql.generator;
 
 
 import org.shaq.graphql.annotations.*;
-import org.shaq.graphql.exceptions.GraphQLQueryGeneratorException;
+import org.shaq.graphql.exceptions.GraphQLQueryGenerationException;
 import org.shaq.graphql.generator.parameters.GraphqlParameterGenerator;
 import org.shaq.graphql.models.GraphqlQueryTypeModel;
 
 import java.lang.reflect.Field;
+import java.util.Optional;
 
 
 public class GraphQLQueryGenerator {
@@ -17,7 +18,7 @@ public class GraphQLQueryGenerator {
         paramGenerator = new GraphqlParameterGenerator();
     }
 
-    public String generateQuery(Class<?> classToGenerate, boolean prettyPrinting) throws GraphQLQueryGeneratorException {
+    public String generateQuery(Class<?> classToGenerate, boolean prettyPrinting) throws GraphQLQueryGenerationException {
         if (classToGenerate.isAnnotationPresent(GraphQLQuery.class)) {
 
             GraphQLQuery graphQLQueryAnnotation = classToGenerate.getAnnotation(GraphQLQuery.class);
@@ -36,28 +37,25 @@ public class GraphQLQueryGenerator {
             return builder.createFinalQuery();
 
         } else {
-            throw new GraphQLQueryGeneratorException("The class " + classToGenerate.getSimpleName() + " has no GraphQLQuery declaration.");
+            throw new GraphQLQueryGenerationException("The class " + classToGenerate.getSimpleName() + " has no GraphQLQuery declaration.");
         }
     }
 
-    public String generateQuery(Class<?> classToGenerate) throws GraphQLQueryGeneratorException {
+    public String generateQuery(Class<?> classToGenerate) throws GraphQLQueryGenerationException {
         return  generateQuery(classToGenerate,false);
     }
 
-    private void addQueryType(Class<?> classToGenerate,GraphqlQueryStringBuilder builder) throws GraphQLQueryGeneratorException {
-        String type = GraphqlQueryTypeModel.QUERY.toString(); //default
+    private void addQueryType(Class<?> classToGenerate,GraphqlQueryStringBuilder builder) throws GraphQLQueryGenerationException {
+        String typeAsString = GraphqlQueryTypeModel.QUERY.toString(); //default
         if (classToGenerate.isAnnotationPresent(GraphQLQueryType.class)) {
-            type = classToGenerate.getAnnotation(GraphQLQueryType.class).value().toString();
-            if(type == null) {
-                throw new GraphQLQueryGeneratorException("The class " + classToGenerate.getSimpleName() + " has no valid Query Type.");
-            }
+            typeAsString = classToGenerate.getAnnotation(GraphQLQueryType.class).value().toString();
         }
 
-        builder.append(type);
+        builder.append(typeAsString);
     }
 
     private void writeParametersOfQuery(GraphqlQueryStringBuilder builder, Class parameters) {
-        if (parameters != null) {
+        if (parameters != null && parameters != Void.class) {
             builder.append(" (");
             builder.append(paramGenerator.generateParameterForClientQuery(parameters));
             builder.append(") ");
